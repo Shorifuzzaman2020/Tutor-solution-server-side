@@ -39,3 +39,25 @@ async function startServer() {
 }
 
 startServer();
+
+
+// POST /users - Save user data
+app.post('/users', async (req, res) => {
+  try {
+    const userData = req.body;
+    const db = client.db('tutorSolutionDB');
+    const collection = db.collection('users');
+
+    const existingUser = await collection.findOne({ uid: userData.uid });
+
+    if (existingUser) {
+      return res.status(400).json({ error: 'User already exists.' });
+    }
+
+    const result = await collection.insertOne(userData);
+    res.status(201).json({ insertedId: result.insertedId });
+  } catch (error) {
+    console.error('Error saving user data:', error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
