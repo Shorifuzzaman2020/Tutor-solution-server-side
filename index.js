@@ -186,3 +186,61 @@ app.delete('/tutorials/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
+// PUT /tutorials/:id - Update ReviewCount of a tutorial
+app.put('/tutorials/:id', async (req, res) => {
+  const { id } = req.params;
+  const { ReviewCount } = req.body;
+
+  try {
+    const db = client.db('tutorSolutionDB');
+    const tutorialCollection = db.collection('tutorials');
+
+    const result = await tutorialCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { review: ReviewCount } } // ✅ Match frontend's display: `tutorial.review`
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(400).json({ error: 'Review update failed' });
+    }
+
+    res.status(200).json({ message: 'Review updated successfully' });
+  } catch (error) {
+    console.error('Error updating review:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+// POST /bookings - Save a booking
+app.post('/bookings', async (req, res) => {
+  const { tutorId, image, language, price, tutorEmail, email } = req.body;
+
+  if (!tutorId || !email || !tutorEmail) {
+    return res.status(400).json({ error: 'Missing required booking fields.' });
+  }
+
+  try {
+    const db = client.db('tutorSolutionDB');
+    const bookingsCollection = db.collection('bookings');
+
+    const newBooking = {
+      tutorId: new ObjectId(tutorId),
+      image,
+      language,
+      price,
+      tutorEmail,
+      email,
+      bookedAt: new Date().toISOString()
+    };
+
+    const result = await bookingsCollection.insertOne(newBooking);
+
+    res.status(201).json({ insertedId: result.insertedId, message: 'Booking successful' });
+  } catch (error) {
+    console.error('Error booking tutorial:', error);
+    res.status(500).json({ error: 'Failed to book tutorial' });
+  }
+});
