@@ -153,3 +153,36 @@ app.put('/tutorials/update/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to update tutorial' });
   }
 });
+
+
+// DELETE /tutorials/:id - Delete a tutorial by ID
+app.delete('/tutorials/:id', async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const db = client.db('tutorSolutionDB');
+    const tutorialCollection = db.collection('tutorials');
+
+    const tutorial = await tutorialCollection.findOne({ _id: new ObjectId(id) });
+
+    if (!tutorial) {
+      return res.status(404).json({ error: 'Tutorial not found' });
+    }
+
+    if (tutorial.userId !== userId) {
+      return res.status(403).json({ error: 'Unauthorized: Only the owner can delete this tutorial.' });
+    }
+
+    const result = await tutorialCollection.deleteOne({ _id: new ObjectId(id) });
+
+    if (result.deletedCount === 1) {
+      res.status(200).json({ message: 'Tutorial deleted successfully' });
+    } else {
+      res.status(500).json({ error: 'Failed to delete tutorial' });
+    }
+  } catch (error) {
+    console.error('Error deleting tutorial:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
