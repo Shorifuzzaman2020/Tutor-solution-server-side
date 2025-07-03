@@ -61,3 +61,34 @@ app.post('/users', async (req, res) => {
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
+
+
+app.post('/tutorials', async (req, res) => {
+  try {
+    const { userId, ...tutorialData } = req.body;
+
+    const db = client.db('tutorSolutionDB');
+    const usersCollection = db.collection('users');
+    
+    const user = await usersCollection.findOne({ uid : userId });
+
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+
+    const newTutorial = {
+      ...tutorialData,
+      userName: user.displayName,
+      userId: user.uid,
+      createdAt: new Date().toISOString()
+    };
+
+    const tutorialCollection = db.collection('tutorials');
+    const result = await tutorialCollection.insertOne(newTutorial);
+
+    res.status(201).json({ insertedId: result.insertedId });
+  } catch (error) {
+    console.error('Error adding recipe:', error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
