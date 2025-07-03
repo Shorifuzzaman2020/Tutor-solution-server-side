@@ -92,3 +92,64 @@ app.post('/tutorials', async (req, res) => {
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
+
+app.get('/tutorials', async (req, res) => {
+  try {
+    const db = client.db('tutorSolutionDB');
+    const tutorialCollection = db.collection('tutorials');
+
+    const tutorials = await tutorialCollection.find({}).toArray();
+
+    res.status(200).json(tutorials);
+  } catch (error) {
+    console.error('Error fetching tutorials:', error);
+    res.status(500).json({ error: 'Failed to fetch tutorials' });
+  }
+});
+
+
+// GET /tutorials/:id - Get tutorial by ID
+app.get('/tutorials/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const db = client.db('tutorSolutionDB');
+    const tutorialCollection = db.collection('tutorials');
+
+    const tutorial = await tutorialCollection.findOne({ _id: new ObjectId(id) });
+
+    if (!tutorial) {
+      return res.status(404).json({ error: 'Tutorial not found' });
+    }
+
+    res.status(200).json(tutorial);
+  } catch (error) {
+    console.error('Error fetching tutorial:', error);
+    res.status(500).json({ error: 'Failed to fetch tutorial' });
+  }
+});
+
+// PUT /tutorials/update/:id - Update tutorial by ID
+app.put('/tutorials/update/:id', async (req, res) => {
+  const { id } = req.params;
+  const updateData = req.body;
+
+  try {
+    const db = client.db('tutorSolutionDB');
+    const tutorialCollection = db.collection('tutorials');
+
+    const result = await tutorialCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updateData }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(400).json({ error: 'Update failed' });
+    }
+
+    res.status(200).json({ message: 'Tutorial updated successfully' });
+  } catch (error) {
+    console.error('Error updating tutorial:', error);
+    res.status(500).json({ error: 'Failed to update tutorial' });
+  }
+});
