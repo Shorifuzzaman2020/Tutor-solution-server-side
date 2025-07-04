@@ -244,3 +244,96 @@ app.post('/bookings', async (req, res) => {
     res.status(500).json({ error: 'Failed to book tutorial' });
   }
 });
+
+
+// GET /bookings?email=user@example.com
+app.get('/bookings', async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email query is required' });
+  }
+
+  try {
+    const db = client.db('tutorSolutionDB');
+    const bookingsCollection = db.collection('bookings');
+
+    const userBookings = await bookingsCollection.find({ email }).toArray();
+    res.status(200).json(userBookings);
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+    res.status(500).json({ error: 'Failed to fetch bookings' });
+  }
+});
+
+
+// PUT /tutorials/:id/review - Increment review by 1
+app.put('/tutorials/:id/review', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const db = client.db('tutorSolutionDB');
+    const tutorialCollection = db.collection('tutorials');
+
+    const result = await tutorialCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $inc: { review: 1 } } // ✅ Use $inc operator
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(400).json({ error: 'Review update failed' });
+    }
+
+    res.status(200).json({ message: 'Review incremented successfully' });
+  } catch (error) {
+    console.error('Error updating review:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /stats/tutorials
+app.get('/stats/tutorials', async (req, res) => {
+  try {
+    const db = client.db('tutorSolutionDB');
+    const tutorials = db.collection('tutorials');
+
+    const totalTutors = await tutorials.countDocuments();
+
+    const reviewAggregation = await tutorials.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalReviews: { $sum: "$review" },
+          languages: { $addToSet: "$language" }
+        }
+      }
+    ]).toArray();
+
+    const totalReviews = reviewAggregation[0]?.totalReviews || 0;
+    const languages = reviewAggregation[0]?.languages || [];
+
+    res.status(200).json({
+      totalTutors,
+      totalReviews,
+      totalLanguages: languages.length
+    });
+  } catch (err) {
+    console.error("Error fetching stats:", err);
+    res.status(500).json({ error: "Failed to fetch tutorial stats" });
+  }
+});
+
+// GET /stats/users
+app.get('/stats/users', async (req, res) => {
+  try {
+    const db = client.db('tutorSolutionDB');
+    const users = db.collection('users');
+
+    const totalUsers = await users.countDocuments();
+
+    res.status(200).json({ totalUsers });
+  } catch (err) {
+    console.error("Error fetching user stats:", err);
+    res.status(500).json({ error: "Failed to fetch user stats" });
+  }
+});
