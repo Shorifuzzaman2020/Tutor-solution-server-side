@@ -132,7 +132,7 @@ app.post('/tutorials', async (req, res) => {
 
 app.get('/tutorials', async (req, res) => {
     try {
-        
+
         const db = client.db('tutorSolutionDB');
         const tutorialCollection = db.collection('tutorials');
 
@@ -285,16 +285,20 @@ app.post('/bookings', async (req, res) => {
 
 
 // GET /bookings?email=user@example.com
-app.get('/bookings',verifyToken, async (req, res) => {
-    const { email } = req.query;
-    if (email !== req.decoded.email) {
-        return res.status(403).send({ message: 'forbidden access' })
-    }
+app.get('/bookings', verifyToken, async (req, res) => {
+    // const { email } = req.query;
+    // if (email !== req.decoded.email) {
+    //     return res.status(403).send({ message: 'forbidden access' })
+    // }
     // if (!email) {
     //     return res.status(400).json({ error: 'Email query is required' });
     // }
 
     try {
+        const { email } = req.query;
+        if (email !== req.decoded.email) {
+            return res.status(403).send({ message: 'forbidden access' })
+        }
         const db = client.db('tutorSolutionDB');
         const bookingsCollection = db.collection('bookings');
 
@@ -308,7 +312,7 @@ app.get('/bookings',verifyToken, async (req, res) => {
 
 
 // PUT /tutorials/:id/review - Increment review by 1
-app.put('/tutorials/:id/review',verifyToken, async (req, res) => {
+app.put('/tutorials/:id/review', verifyToken, async (req, res) => {
     const { id } = req.params;
     const { email } = req.query;
     if (email !== req.decoded.email) {
