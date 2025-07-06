@@ -8,7 +8,7 @@ const port = process.env.PORT || 3000;
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 app.use(cors({
-    origin: ['http://localhost:5173','https://fir-auth-5fe90.web.app'],
+    origin: ['https://fir-auth-5fe90.web.app'],
     credentials: true
 }));
 app.use(express.json());
