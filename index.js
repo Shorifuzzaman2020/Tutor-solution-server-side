@@ -72,7 +72,8 @@ app.post('/jwt', async (req, res) => {
 
     res.cookie('token', token, {
         httpOnly: true,
-        secure: false,
+        secure: true,
+        sameSite: 'None'
     })
 
     res.send({ success: true })
