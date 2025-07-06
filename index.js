@@ -130,13 +130,9 @@ app.post('/tutorials', async (req, res) => {
     }
 });
 
-app.get('/tutorials', logger, verifyToken, async (req, res) => {
+app.get('/tutorials', async (req, res) => {
     try {
-        // const email = req.query.email;
-        // if(email !== req.decoded.email){
-        //     return res.status(403).send({message: 'forbidden access'})
-        // }
-        // console.log('inside tutorial',req.cookies);
+        
         const db = client.db('tutorSolutionDB');
         const tutorialCollection = db.collection('tutorials');
 
