@@ -1,4 +1,355 @@
 
+// const express = require('express');
+// const cors = require('cors');
+// require('dotenv').config();
+// const { MongoClient, ObjectId, ServerApiVersion } = require('mongodb');
+// const app = express();
+// const port = process.env.PORT || 3000;
+// const jwt=require('jsonwebtoken');
+// app.use(cors());
+// app.use(express.json());
+// app.get('/',(req, res) =>{
+//     res.send('Tutor server site')
+// })
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dzmpelq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+
+// const client = new MongoClient(uri, {
+//   serverApi: {
+//     version: ServerApiVersion.v1,
+//     strict: true,
+//     deprecationErrors: true,
+//   }
+// });
+
+// // Database connection and server startup
+// async function startServer() {
+//   try {
+//     // Connect to MongoDB
+//     await client.connect();
+//     console.log("Connected to MongoDB");
+    
+//     // Start Express server
+//     app.listen(port, () => {
+//       console.log(`Server is running on port: ${port}`);
+//     });
+//   } catch (error) {
+//     console.error("Failed to connect to MongoDB", error);
+//     process.exit(1);
+//   }
+// }
+
+// startServer();
+
+
+// // POST /users - Save user data
+// app.post('/users', async (req, res) => {
+//   try {
+//     const userData = req.body;
+//     const db = client.db('tutorSolutionDB');
+//     const collection = db.collection('users');
+
+//     const existingUser = await collection.findOne({ uid: userData.uid });
+
+//     if (existingUser) {
+//       return res.status(400).json({ error: 'User already exists.' });
+//     }
+
+//     const result = await collection.insertOne(userData);
+//     res.status(201).json({ insertedId: result.insertedId });
+//   } catch (error) {
+//     console.error('Error saving user data:', error);
+//     res.status(500).json({ error: 'Something went wrong' });
+//   }
+// });
+
+
+// app.post('/tutorials', async (req, res) => {
+//   try {
+//     const { userId, ...tutorialData } = req.body;
+
+//     const db = client.db('tutorSolutionDB');
+//     const usersCollection = db.collection('users');
+    
+//     const user = await usersCollection.findOne({ uid : userId });
+
+//     if (!user) {
+//       return res.status(400).json({ error: 'User not found' });
+//     }
+
+//     const newTutorial = {
+//       ...tutorialData,
+//       userName: user.displayName,
+//       userId: user.uid,
+//       createdAt: new Date().toISOString()
+//     };
+
+//     const tutorialCollection = db.collection('tutorials');
+//     const result = await tutorialCollection.insertOne(newTutorial);
+
+//     res.status(201).json({ insertedId: result.insertedId });
+//   } catch (error) {
+//     console.error('Error adding recipe:', error);
+//     res.status(500).json({ error: 'Something went wrong' });
+//   }
+// });
+
+// app.get('/tutorials', async (req, res) => {
+//   try {
+//     const db = client.db('tutorSolutionDB');
+//     const tutorialCollection = db.collection('tutorials');
+
+//     const tutorials = await tutorialCollection.find({}).toArray();
+
+//     res.status(200).json(tutorials);
+//   } catch (error) {
+//     console.error('Error fetching tutorials:', error);
+//     res.status(500).json({ error: 'Failed to fetch tutorials' });
+//   }
+// });
+
+
+// // GET /tutorials/:id - Get tutorial by ID
+// app.get('/tutorials/:id', async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     const db = client.db('tutorSolutionDB');
+//     const tutorialCollection = db.collection('tutorials');
+
+//     const tutorial = await tutorialCollection.findOne({ _id: new ObjectId(id) });
+
+//     if (!tutorial) {
+//       return res.status(404).json({ error: 'Tutorial not found' });
+//     }
+
+//     res.status(200).json(tutorial);
+//   } catch (error) {
+//     console.error('Error fetching tutorial:', error);
+//     res.status(500).json({ error: 'Failed to fetch tutorial' });
+//   }
+// });
+
+// // PUT /tutorials/update/:id - Update tutorial by ID
+// app.put('/tutorials/update/:id', async (req, res) => {
+//   const { id } = req.params;
+//   const updateData = req.body;
+
+//   try {
+//     const db = client.db('tutorSolutionDB');
+//     const tutorialCollection = db.collection('tutorials');
+
+//     const result = await tutorialCollection.updateOne(
+//       { _id: new ObjectId(id) },
+//       { $set: updateData }
+//     );
+
+//     if (result.modifiedCount === 0) {
+//       return res.status(400).json({ error: 'Update failed' });
+//     }
+
+//     res.status(200).json({ message: 'Tutorial updated successfully' });
+//   } catch (error) {
+//     console.error('Error updating tutorial:', error);
+//     res.status(500).json({ error: 'Failed to update tutorial' });
+//   }
+// });
+
+
+// // DELETE /tutorials/:id - Delete a tutorial by ID
+// app.delete('/tutorials/:id', async (req, res) => {
+//   const { id } = req.params;
+//   const { userId } = req.body;
+
+//   try {
+//     const db = client.db('tutorSolutionDB');
+//     const tutorialCollection = db.collection('tutorials');
+
+//     const tutorial = await tutorialCollection.findOne({ _id: new ObjectId(id) });
+
+//     if (!tutorial) {
+//       return res.status(404).json({ error: 'Tutorial not found' });
+//     }
+
+//     if (tutorial.userId !== userId) {
+//       return res.status(403).json({ error: 'Unauthorized: Only the owner can delete this tutorial.' });
+//     }
+
+//     const result = await tutorialCollection.deleteOne({ _id: new ObjectId(id) });
+
+//     if (result.deletedCount === 1) {
+//       res.status(200).json({ message: 'Tutorial deleted successfully' });
+//     } else {
+//       res.status(500).json({ error: 'Failed to delete tutorial' });
+//     }
+//   } catch (error) {
+//     console.error('Error deleting tutorial:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+
+// // PUT /tutorials/:id - Update ReviewCount of a tutorial
+// app.put('/tutorials/:id', async (req, res) => {
+//   const { id } = req.params;
+//   const { ReviewCount } = req.body;
+
+//   try {
+//     const db = client.db('tutorSolutionDB');
+//     const tutorialCollection = db.collection('tutorials');
+
+//     const result = await tutorialCollection.updateOne(
+//       { _id: new ObjectId(id) },
+//       { $set: { review: ReviewCount } } // ✅ Match frontend's display: `tutorial.review`
+//     );
+
+//     if (result.modifiedCount === 0) {
+//       return res.status(400).json({ error: 'Review update failed' });
+//     }
+
+//     res.status(200).json({ message: 'Review updated successfully' });
+//   } catch (error) {
+//     console.error('Error updating review:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+
+// // POST /bookings - Save a booking
+// app.post('/bookings', async (req, res) => {
+//   const { tutorId, image, language, price, tutorEmail, email } = req.body;
+
+//   if (!tutorId || !email || !tutorEmail) {
+//     return res.status(400).json({ error: 'Missing required booking fields.' });
+//   }
+
+//   try {
+//     const db = client.db('tutorSolutionDB');
+//     const bookingsCollection = db.collection('bookings');
+
+//     const newBooking = {
+//       tutorId: new ObjectId(tutorId),
+//       image,
+//       language,
+//       price,
+//       tutorEmail,
+//       email,
+//       bookedAt: new Date().toISOString()
+//     };
+
+//     const result = await bookingsCollection.insertOne(newBooking);
+
+//     res.status(201).json({ insertedId: result.insertedId, message: 'Booking successful' });
+//   } catch (error) {
+//     console.error('Error booking tutorial:', error);
+//     res.status(500).json({ error: 'Failed to book tutorial' });
+//   }
+// });
+
+
+// // GET /bookings?email=user@example.com
+// app.get('/bookings', async (req, res) => {
+//   const { email } = req.query;
+
+//   if (!email) {
+//     return res.status(400).json({ error: 'Email query is required' });
+//   }
+
+//   try {
+//     const db = client.db('tutorSolutionDB');
+//     const bookingsCollection = db.collection('bookings');
+
+//     const userBookings = await bookingsCollection.find({ email }).toArray();
+//     res.status(200).json(userBookings);
+//   } catch (error) {
+//     console.error('Error fetching bookings:', error);
+//     res.status(500).json({ error: 'Failed to fetch bookings' });
+//   }
+// });
+
+
+// // PUT /tutorials/:id/review - Increment review by 1
+// app.put('/tutorials/:id/review', async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     const db = client.db('tutorSolutionDB');
+//     const tutorialCollection = db.collection('tutorials');
+
+//     // const result = await tutorialCollection.updateOne(
+//     //   { _id: new ObjectId(id) },
+//     //   { $inc: { review: 1 } } // ✅ Use $inc operator
+//     // );
+
+//     // if (result.modifiedCount === 0) {
+//     //   return res.status(400).json({ error: 'Review update failed' });
+//     // }
+//     const result = await tutorialCollection.updateOne(
+//     { _id: new ObjectId(id) },
+//     { $inc: { review: 1 } }
+//     );
+
+//     if (result.modifiedCount === 0) {
+//     return res.status(400).json({ error: 'Review update failed' });
+//     }
+
+
+//     res.status(200).json({ message: 'Review incremented successfully' });
+//   } catch (error) {
+//     console.error('Error updating review:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+// // GET /stats/tutorials
+// app.get('/stats/tutorials', async (req, res) => {
+//   try {
+//     const db = client.db('tutorSolutionDB');
+//     const tutorials = db.collection('tutorials');
+
+//     const totalTutors = await tutorials.countDocuments();
+
+//     const reviewAggregation = await tutorials.aggregate([
+//       {
+//         $group: {
+//           _id: null,
+//           totalReviews: { $sum: "$review" },
+//           languages: { $addToSet: "$language" }
+//         }
+//       }
+//     ]).toArray();
+
+//     const totalReviews = reviewAggregation[0]?.totalReviews || 0;
+//     const languages = reviewAggregation[0]?.languages || [];
+
+//     res.status(200).json({
+//       totalTutors,
+//       totalReviews,
+//       totalLanguages: languages.length
+//     });
+//   } catch (err) {
+//     console.error("Error fetching stats:", err);
+//     res.status(500).json({ error: "Failed to fetch tutorial stats" });
+//   }
+// });
+
+// // GET /stats/users
+// app.get('/stats/users', async (req, res) => {
+//   try {
+//     const db = client.db('tutorSolutionDB');
+//     const users = db.collection('users');
+
+//     const totalUsers = await users.countDocuments();
+
+//     res.status(200).json({ totalUsers });
+//   } catch (err) {
+//     console.error("Error fetching user stats:", err);
+//     res.status(500).json({ error: "Failed to fetch user stats" });
+//   }
+// });
+
+
+
+
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -275,14 +626,6 @@ app.put('/tutorials/:id/review', async (req, res) => {
     const db = client.db('tutorSolutionDB');
     const tutorialCollection = db.collection('tutorials');
 
-    // const result = await tutorialCollection.updateOne(
-    //   { _id: new ObjectId(id) },
-    //   { $inc: { review: 1 } } // ✅ Use $inc operator
-    // );
-
-    // if (result.modifiedCount === 0) {
-    //   return res.status(400).json({ error: 'Review update failed' });
-    // }
     const result = await tutorialCollection.updateOne(
     { _id: new ObjectId(id) },
     { $inc: { review: 1 } }
@@ -347,4 +690,384 @@ app.get('/stats/users', async (req, res) => {
   }
 });
 
+
+// Profile Collection
+
+// GET /profile/:userId - Get user profile
+app.get('/profile/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const db = client.db('tutorSolutionDB');
+    const profileCollection = db.collection('profiles');
+
+    const profile = await profileCollection.findOne({ userId });
+
+    if (!profile) {
+      // Return default profile if none exists
+      return res.status(200).json({
+        name: "",
+        headline: "",
+        location: "",
+        email: "",
+        bio: "",
+        skills: []
+      });
+    }
+
+    res.status(200).json(profile);
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    res.status(500).json({ error: 'Failed to fetch profile' });
+  }
+});
+
+// PATCH /profile/:userId - Update profile fields
+app.patch('/profile/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const updates = req.body;
+    const db = client.db('tutorSolutionDB');
+    const profileCollection = db.collection('profiles');
+
+    // Upsert: Create if doesn't exist, update if it does
+    const result = await profileCollection.updateOne(
+      { userId },
+      { $set: updates },
+      { upsert: true }
+    );
+
+    res.status(200).json({ message: 'Profile updated successfully' });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
+// POST /profile/:userId/skills - Add a skill
+app.post('/profile/:userId/skills', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { skill } = req.body;
+    const db = client.db('tutorSolutionDB');
+    const profileCollection = db.collection('profiles');
+
+    // Add skill to array if it doesn't already exist
+    const result = await profileCollection.updateOne(
+      { userId },
+      { $addToSet: { skills: skill } },
+      { upsert: true }
+    );
+
+    res.status(200).json({ message: 'Skill added successfully' });
+  } catch (error) {
+    console.error('Error adding skill:', error);
+    res.status(500).json({ error: 'Failed to add skill' });
+  }
+});
+
+// DELETE /profile/:userId/skills - Remove a skill
+app.delete('/profile/:userId/skills', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { skill } = req.body;
+    const db = client.db('tutorSolutionDB');
+    const profileCollection = db.collection('profiles');
+
+    const result = await profileCollection.updateOne(
+      { userId },
+      { $pull: { skills: skill } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ error: 'Skill not found or already removed' });
+    }
+
+    res.status(200).json({ message: 'Skill removed successfully' });
+  } catch (error) {
+    console.error('Error removing skill:', error);
+    res.status(500).json({ error: 'Failed to remove skill' });
+  }
+});
+
+// Education Collection
+
+// GET /education/:userId - Get all education entries
+app.get('/education/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const db = client.db('tutorSolutionDB');
+    const educationCollection = db.collection('education');
+
+    const education = await educationCollection.find({ userId }).toArray();
+
+    res.status(200).json(education);
+  } catch (error) {
+    console.error('Error fetching education:', error);
+    res.status(500).json({ error: 'Failed to fetch education' });
+  }
+});
+
+// POST /education/:userId - Add new education entry
+app.post('/education/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const educationData = req.body;
+    const db = client.db('tutorSolutionDB');
+    const educationCollection = db.collection('education');
+
+    const newEducation = {
+      userId,
+      degree: educationData.degree || "",
+      school: educationData.school || "",
+      year: educationData.year || "",
+      createdAt: new Date()
+    };
+
+    const result = await educationCollection.insertOne(newEducation);
+
+    res.status(201).json({ 
+      _id: result.insertedId,
+      ...newEducation
+    });
+  } catch (error) {
+    console.error('Error adding education:', error);
+    res.status(500).json({ error: 'Failed to add education' });
+  }
+});
+
+// PATCH /education/:userId/:id - Update education entry
+app.patch('/education/:userId/:id', async (req, res) => {
+  try {
+    const { userId, id } = req.params;
+    const updates = req.body;
+    const db = client.db('tutorSolutionDB');
+    const educationCollection = db.collection('education');
+
+    const result = await educationCollection.updateOne(
+      { _id: new ObjectId(id), userId },
+      { $set: updates }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ error: 'Education entry not found or not updated' });
+    }
+
+    res.status(200).json({ message: 'Education updated successfully' });
+  } catch (error) {
+    console.error('Error updating education:', error);
+    res.status(500).json({ error: 'Failed to update education' });
+  }
+});
+
+// DELETE /education/:userId/:id - Delete education entry
+app.delete('/education/:userId/:id', async (req, res) => {
+  try {
+    const { userId, id } = req.params;
+    const db = client.db('tutorSolutionDB');
+    const educationCollection = db.collection('education');
+
+    const result = await educationCollection.deleteOne({ 
+      _id: new ObjectId(id), 
+      userId 
+    });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Education entry not found' });
+    }
+
+    res.status(200).json({ message: 'Education deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting education:', error);
+    res.status(500).json({ error: 'Failed to delete education' });
+  }
+});
+
+
+
+// GET /experience/:userId - Get all experience entries
+app.get('/experience/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const db = client.db('tutorSolutionDB');
+    const experienceCollection = db.collection('experience');
+
+    const experience = await experienceCollection.find({ userId }).toArray();
+
+    res.status(200).json(experience);
+  } catch (error) {
+    console.error('Error fetching experience:', error);
+    res.status(500).json({ error: 'Failed to fetch experience' });
+  }
+});
+
+// POST /experience/:userId - Add new experience entry
+app.post('/experience/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const experienceData = req.body;
+    const db = client.db('tutorSolutionDB');
+    const experienceCollection = db.collection('experience');
+
+    const newExperience = {
+      userId,
+      role: experienceData.role || "",
+      company: experienceData.company || "",
+      duration: experienceData.duration || "",
+      description: experienceData.description || "",
+      createdAt: new Date()
+    };
+
+    const result = await experienceCollection.insertOne(newExperience);
+
+    res.status(201).json({ 
+      _id: result.insertedId,
+      ...newExperience
+    });
+  } catch (error) {
+    console.error('Error adding experience:', error);
+    res.status(500).json({ error: 'Failed to add experience' });
+  }
+});
+
+// PATCH /experience/:userId/:id - Update experience entry
+app.patch('/experience/:userId/:id', async (req, res) => {
+  try {
+    const { userId, id } = req.params;
+    const updates = req.body;
+    const db = client.db('tutorSolutionDB');
+    const experienceCollection = db.collection('experience');
+
+    const result = await experienceCollection.updateOne(
+      { _id: new ObjectId(id), userId },
+      { $set: updates }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ error: 'Experience entry not found or not updated' });
+    }
+
+    res.status(200).json({ message: 'Experience updated successfully' });
+  } catch (error) {
+    console.error('Error updating experience:', error);
+    res.status(500).json({ error: 'Failed to update experience' });
+  }
+});
+
+// DELETE /experience/:userId/:id - Delete experience entry
+app.delete('/experience/:userId/:id', async (req, res) => {
+  try {
+    const { userId, id } = req.params;
+    const db = client.db('tutorSolutionDB');
+    const experienceCollection = db.collection('experience');
+
+    const result = await experienceCollection.deleteOne({ 
+      _id: new ObjectId(id), 
+      userId 
+    });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Experience entry not found' });
+    }
+
+    res.status(200).json({ message: 'Experience deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting experience:', error);
+    res.status(500).json({ error: 'Failed to delete experience' });
+  }
+});
+
+
+
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+
+
+// GET /avatar/:userId - Get avatar image
+app.get('/avatar/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const db = client.db('tutorSolutionDB');
+    const avatarsCollection = db.collection('avatars');
+
+    const avatar = await avatarsCollection.findOne({ userId });
+
+    if (!avatar || !avatar.image) {
+      return res.status(404).json({ error: 'Avatar not found' });
+    }
+
+    res.set('Content-Type', avatar.contentType);
+    res.send(avatar.image);
+  } catch (error) {
+    console.error('Error fetching avatar:', error);
+    res.status(500).json({ error: 'Failed to fetch avatar' });
+  }
+});
+
+
+
+// GET /banner/:userId - Get banner image
+app.get('/banner/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const db = client.db('tutorSolutionDB');
+    const bannersCollection = db.collection('banners');
+
+    const banner = await bannersCollection.findOne({ userId });
+
+    if (!banner || !banner.image) {
+      return res.status(404).json({ error: 'Banner not found' });
+    }
+
+    res.set('Content-Type', banner.contentType);
+    res.send(banner.image);
+  } catch (error) {
+    console.error('Error fetching banner:', error);
+    res.status(500).json({ error: 'Failed to fetch banner' });
+  }
+});
+
+
+
+// Profile Image Endpoints (updated to just store URLs)
+app.patch('/profile/:userId/avatar', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { avatarUrl } = req.body;
+    const db = client.db('tutorSolutionDB');
+    const profileCollection = db.collection('profiles');
+
+    const result = await profileCollection.updateOne(
+      { userId },
+      { $set: { avatar: avatarUrl } },
+      { upsert: true }
+    );
+
+    res.status(200).json({ message: 'Avatar updated successfully' });
+  } catch (error) {
+    console.error('Error updating avatar:', error);
+    res.status(500).json({ error: 'Failed to update avatar' });
+  }
+});
+
+app.patch('/profile/:userId/banner', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { bannerUrl } = req.body;
+    const db = client.db('tutorSolutionDB');
+    const profileCollection = db.collection('profiles');
+
+    const result = await profileCollection.updateOne(
+      { userId },
+      { $set: { banner: bannerUrl } },
+      { upsert: true }
+    );
+
+    res.status(200).json({ message: 'Banner updated successfully' });
+  } catch (error) {
+    console.error('Error updating banner:', error);
+    res.status(500).json({ error: 'Failed to update banner' });
+  }
+});
 
